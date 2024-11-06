@@ -13,11 +13,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TaxiPool {
 	private static final long EXPIRED_TIME_IN_MILLISECOND = 2000;
-	private static final int NUMBER_OF_TAXI = 4;
+	private int taxiNumber = 4;
 	private final List<Taxi> available = Collections.synchronizedList(new ArrayList<>());
 	private final List<Taxi> inUse = Collections.synchronizedList(new ArrayList<>());
 	private final AtomicInteger count = new AtomicInteger(0);
 	private final AtomicBoolean waiting = new AtomicBoolean(false);
+
+	public int getTaxiNumber() {
+		return taxiNumber;
+	}
+
+	public void setTaxiNumber(int taxiNumber) {
+		this.taxiNumber = taxiNumber;
+	}
 
 	public void release(Taxi taxi) {    // if release is synchronized, it will have to wait after all getTaxi done
 		// --> 1 object only has 1 monitor lock for all methods?
@@ -32,7 +40,7 @@ public class TaxiPool {
 			inUse.add(taxi);
 			return taxi;
 		}
-		if (count.get() == NUMBER_OF_TAXI) {
+		if (count.get() == taxiNumber) {
 			this.waitingUntilTaxiAvailable();
 			return this.getTaxi();
 		}
